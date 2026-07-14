@@ -1,0 +1,220 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block extrastyle %}
+<style>
+    :root {
+        --primary: #1C1C1E;
+        --secondary: #0A7A3C;
+        --accent: #F2F2F7;
+        --body-fg: #F5F5F7;
+        --body-bg: #0A0A0A;
+        --body-quiet-color: #8E8E93;
+        --body-loud-color: #F5F5F7;
+        --header-color: #F5F5F7;
+        --header-branding-color: #F5F5F7;
+        --header-bg: #1C1C1E;
+        --header-link-color: #F5F5F7;
+        --breadcrumbs-fg: #8E8E93;
+        --breadcrumbs-link-fg: #F5F5F7;
+        --breadcrumbs-bg: #1C1C1E;
+        --link-fg: #0A7A3C;
+        --link-hover-color: #064F26;
+        --link-selected-fg: #0A7A3C;
+        --button-bg: #0A7A3C;
+        --button-hover-bg: #064F26;
+        --default-button-bg: #0A7A3C;
+        --default-button-hover-bg: #064F26;
+        --close-button-bg: #8E8E93;
+        --close-button-hover-bg: #1C1C1E;
+        --delete-button-bg: #FF3B30;
+        --delete-button-hover-bg: #CC0000;
+        --object-tools-fg: #F5F5F7;
+        --object-tools-bg: #0A7A3C;
+        --object-tools-hover-bg: #064F26;
+        --border-radius: 16px;
+        --border-radius-small: 12px;
+    }
+
+    #header {
+        border-radius: 16px 16px 0 0;
+        padding: 12px 24px;
+        background: #1C1C1E !important;
+        border-bottom: 0.5px solid rgba(255,255,255,0.05);
+    }
+
+    #branding h1 {
+        color: #F5F5F7 !important;
+        font-weight: 700;
+    }
+
+    #user-tools {
+        color: #8E8E93 !important;
+    }
+
+    #user-tools a {
+        color: #F5F5F7 !important;
+        text-decoration: none;
+        padding: 4px 12px;
+        border-radius: 30px;
+        background: rgba(255,255,255,0.05);
+        transition: 0.2s;
+    }
+
+    #user-tools a:hover {
+        background: rgba(255,255,255,0.1);
+    }
+
+    #content {
+        background: #0A0A0A !important;
+        padding: 24px;
+        border-radius: 0 0 16px 16px;
+    }
+
+    #content-main {
+        background: #1C1C1E !important;
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+    }
+
+    .module h2, .module caption, .inline-group h2 {
+        background: #1C1C1E !important;
+        color: #F5F5F7 !important;
+        border-radius: 12px;
+        padding: 12px 16px;
+        border-bottom: 0.5px solid rgba(255,255,255,0.05);
+    }
+
+    .module {
+        background: #1C1C1E !important;
+        border-radius: 12px;
+        border: 0.5px solid rgba(255,255,255,0.05);
+    }
+
+    .module table {
+        background: #1C1C1E !important;
+        border-radius: 12px;
+    }
+
+    .module th {
+        color: #8E8E93 !important;
+        font-weight: 600;
+    }
+
+    .module td {
+        color: #F5F5F7 !important;
+        border-bottom: 0.5px solid rgba(255,255,255,0.05);
+    }
+
+    a {
+        color: #0A7A3C !important;
+        text-decoration: none;
+    }
+
+    a:hover {
+        color: #064F26 !important;
+    }
+
+    .button, input[type=submit], input[type=button], .submit-row input, a.button {
+        background: #0A7A3C !important;
+        color: #F5F5F7 !important;
+        border: none !important;
+        border-radius: 30px !important;
+        padding: 8px 20px !important;
+        font-weight: 600 !important;
+        transition: 0.2s !important;
+    }
+
+    .button:hover, input[type=submit]:hover, input[type=button]:hover, .submit-row input:hover, a.button:hover {
+        background: #064F26 !important;
+        transform: scale(0.97);
+    }
+
+    .button.default, input[type=submit].default, .submit-row input.default {
+        background: #0A7A3C !important;
+    }
+
+    .button.default:hover, input[type=submit].default:hover, .submit-row input.default:hover {
+        background: #064F26 !important;
+    }
+
+    .deletelink {
+        color: #FF3B30 !important;
+    }
+
+    .deletelink:hover {
+        color: #CC0000 !important;
+    }
+
+    .dashboard #content {
+        background: #0A0A0A !important;
+    }
+
+    .dashboard .module table th {
+        color: #8E8E93 !important;
+    }
+
+    .dashboard .module table td {
+        color: #F5F5F7 !important;
+    }
+
+    .breadcrumbs {
+        background: #1C1C1E !important;
+        color: #8E8E93 !important;
+        border-radius: 12px;
+        padding: 8px 16px;
+        margin-bottom: 16px;
+        border: 0.5px solid rgba(255,255,255,0.05);
+    }
+
+    .breadcrumbs a {
+        color: #F5F5F7 !important;
+    }
+
+    .breadcrumbs a:hover {
+        color: #0A7A3C !important;
+    }
+
+    .submit-row {
+        background: transparent !important;
+        border: none !important;
+        padding: 12px 0 !important;
+    }
+
+    /* СКРОЛЛ */
+    ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: #1C1C1E;
+        border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: #0A7A3C;
+        border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: #064F26;
+    }
+
+    /* Кнопка темы */
+    .theme-toggle {
+        background: rgba(255,255,255,0.05);
+        border: none;
+        color: #F5F5F7;
+        padding: 4px 12px;
+        border-radius: 30px;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .theme-toggle:hover {
+        background: rgba(255,255,255,0.1);
+    }
+</style>
+{% endblock %}

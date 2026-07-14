@@ -1,0 +1,62 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block content %}
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
+    <div style="background: #0A7A3C; color: white; padding: 20px; border-radius: 16px; text-align: center;">
+        <div style="font-size: 32px; font-weight: 700;">{{ total_users }}</div>
+        <div>👥 Всего пользователей</div>
+    </div>
+    <div style="background: #0A7A3C; color: white; padding: 20px; border-radius: 16px; text-align: center;">
+        <div style="font-size: 32px; font-weight: 700;">{{ active_users }}</div>
+        <div>🟢 Активных</div>
+    </div>
+    <div style="background: #FF3B30; color: white; padding: 20px; border-radius: 16px; text-align: center;">
+        <div style="font-size: 32px; font-weight: 700;">{{ blocked_users }}</div>
+        <div>🚫 Заблокировано</div>
+    </div>
+    <div style="background: #1C1C1E; color: white; padding: 20px; border-radius: 16px; text-align: center;">
+        <div style="font-size: 32px; font-weight: 700;">{{ total_chats }}</div>
+        <div>💬 Всего чатов</div>
+    </div>
+    <div style="background: #1C1C1E; color: white; padding: 20px; border-radius: 16px; text-align: center;">
+        <div style="font-size: 32px; font-weight: 700;">{{ total_messages }}</div>
+        <div>📨 Всего сообщений</div>
+    </div>
+    <div style="background: #0A7A3C; color: white; padding: 20px; border-radius: 16px; text-align: center;">
+        <div style="font-size: 32px; font-weight: 700;">{{ messages_today }}</div>
+        <div>📨 Сообщений сегодня</div>
+    </div>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px;">
+    <div style="background: white; padding: 20px; border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+        <h3 style="margin-bottom: 12px;">📊 Активность</h3>
+        <ul style="list-style: none; padding: 0;">
+            <li style="padding: 8px 0; border-bottom: 1px solid #eee;">👥 Онлайн сейчас: <strong>{{ active_users_24h }}</strong></li>
+            <li style="padding: 8px 0; border-bottom: 1px solid #eee;">👥 Групповые чаты: <strong>{{ group_chats }}</strong></li>
+            <li style="padding: 8px 0; border-bottom: 1px solid #eee;">👤 Личные чаты: <strong>{{ private_chats }}</strong></li>
+            <li style="padding: 8px 0;">🖼️ Стикеров: <strong>{{ total_stickers }}</strong></li>
+        </ul>
+    </div>
+    <div style="background: white; padding: 20px; border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+        <h3 style="margin-bottom: 12px;">🕐 Последние действия</h3>
+        <ul style="list-style: none; padding: 0; max-height: 250px; overflow-y: auto;">
+            {% for activity in recent_activities %}
+                <li style="padding: 6px 0; border-bottom: 1px solid #eee; font-size: 14px;">
+                    <strong>{{ activity.user.username }}</strong> — {{ activity.action }}
+                    <span style="color: #8E8E93; font-size: 12px; display: block;">{{ activity.timestamp|date:"d.m.Y H:i" }}</span>
+                </li>
+            {% empty %}
+                <li style="padding: 8px 0; color: #8E8E93;">Нет действий</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
+<style>
+    /* Тёмная тема для админки */
+    body.dark .card { background: #1C1C1E; color: #F5F5F7; }
+    body.dark .card li { border-color: rgba(255,255,255,0.05); }
+</style>
+{% endblock %}

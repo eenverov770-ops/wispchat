@@ -1,0 +1,1273 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>WispChat</title>
+    <link rel="manifest" href="/static/manifest.json">
+    <link rel="apple-touch-icon" href="/static/icons/icon-192.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="WispChat">
+    <meta name="theme-color" content="#1C1C1E">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: #F2F2F7;
+            color: #1C1C1E;
+            padding-top: 56px;
+            padding-bottom: 64px;
+            height: 100vh;
+            overflow: hidden;
+            transition: background 0.3s, color 0.3s;
+        }
+        body.dark {
+            background: #0A0A0A;
+            color: #F5F5F7;
+        }
+        body.dark .header {
+            background: #1C1C1E;
+            border-bottom: 0.5px solid rgba(255,255,255,0.05);
+        }
+        body.dark .header .back { color: #F5F5F7; }
+        body.dark .header .info .name { color: #F5F5F7; }
+        body.dark .header .info .status { color: #8E8E93; }
+        body.dark .message .bubble {
+            background: #1C1C1E;
+            color: #F5F5F7;
+        }
+        body.dark .message.me .bubble {
+            background: #0A7A3C;
+            color: #F5F5F7;
+        }
+        body.dark .input-area {
+            background: rgba(28,28,30,0.95);
+            border-top: 0.5px solid rgba(255,255,255,0.05);
+        }
+        body.dark .input-area .input-row {
+            background: #1C1C1E;
+            border-color: rgba(255,255,255,0.05);
+        }
+        body.dark .input-area .input-row input { color: #F5F5F7; }
+        body.dark .input-area .input-row input::placeholder { color: #8E8E93; }
+        body.dark .input-area .input-row .action-btn { color: #8E8E93; }
+        body.dark .input-area .input-row .sticker-btn { color: #8E8E93; }
+        body.dark .message .author { color: #8E8E93; }
+        body.dark .message .time { color: #8E8E93; }
+        body.dark .message .status-icon { color: #8E8E93; }
+        body.dark .message .status-icon.read { color: #0A7A3C; }
+        body.dark .sticker-panel { background: #1C1C1E; }
+        body.dark .message-menu { background: #1C1C1E; border: 0.5px solid rgba(255,255,255,0.05); }
+        body.dark .message-menu button { color: #F5F5F7; }
+        body.dark .message-menu button:hover { background: #2C2C2E; }
+        body.dark .reply-indicator { background: #1C1C1E; color: #8E8E93; border: 0.5px solid rgba(255,255,255,0.05); }
+        body.dark .typing-indicator { background: rgba(28,28,30,0.95); color: #8E8E93; }
+        body.dark .reactions-panel { background: #1C1C1E; border: 0.5px solid rgba(255,255,255,0.05); }
+        body.dark .message .reactions .reaction-item { background: rgba(255,255,255,0.05); color: #F5F5F7; }
+        body.dark .message .reactions .reaction-item .count { color: #8E8E93; }
+        body.dark .settings-btn { color: #F5F5F7; }
+        body.dark .settings-content { background: #1C1C1E; }
+        body.dark .settings-content select { background: #2C2C2E; color: #F5F5F7; border: 0.5px solid rgba(255,255,255,0.05); }
+        body.dark .settings-content input[type="number"] { background: #2C2C2E; color: #F5F5F7; border: 0.5px solid rgba(255,255,255,0.05); }
+        body.dark .settings-member { border-bottom: 0.5px solid rgba(255,255,255,0.05); }
+        body.dark .settings-badge { background: #0A7A3C; color: #F5F5F7; }
+        body.dark .media-viewer { background: rgba(0,0,0,0.95); }
+        body.dark .media-viewer .close-viewer { color: #F5F5F7; }
+
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: #1C1C1E;
+            padding: 10px 14px 8px;
+            display: flex;
+            align-items: center;
+            border-bottom: none;
+            z-index: 100;
+            max-width: 600px;
+            margin: 0 auto;
+            transition: background 0.3s;
+        }
+        .header .back {
+            font-size: 22px;
+            color: #FFFFFF;
+            text-decoration: none;
+            margin-right: 10px;
+            opacity: 0.8;
+            transition: color 0.3s;
+            flex-shrink: 0;
+        }
+        .header .back:active { opacity: 0.5; }
+        .header .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #0A7A3C;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: 600;
+            color: #FFFFFF;
+            flex-shrink: 0;
+            margin-right: 10px;
+            object-fit: cover;
+            overflow: hidden;
+            cursor: pointer;
+        }
+        .header .avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .header .avatar .placeholder { text-transform: uppercase; }
+        .header .info {
+            flex: 1;
+            cursor: pointer;
+            min-width: 0;
+        }
+        .header .info .name {
+            font-size: 17px;
+            font-weight: 600;
+            color: #FFFFFF;
+            transition: color 0.3s;
+        }
+        .header .info .status {
+            font-size: 12px;
+            color: #8E8E93;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            transition: color 0.3s;
+        }
+        .settings-btn {
+            color: #FFFFFF;
+            text-decoration: none;
+            font-size: 18px;
+            opacity: 0.8;
+            transition: color 0.3s;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px 6px;
+            flex-shrink: 0;
+        }
+        .settings-btn:active { opacity: 0.5; }
+        #message-list {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 12px 14px 70px;
+            height: calc(100vh - 120px);
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+        .message { margin-bottom: 6px; display: flex; flex-direction: column; position: relative; }
+        .message.me { align-items: flex-end; }
+        .message-wrapper {
+            display: flex;
+            align-items: flex-end;
+            gap: 8px;
+            max-width: 85%;
+        }
+        .message.me .message-wrapper { flex-direction: row-reverse; }
+        .message-avatar {
+            width: 32px;
+            height: 32px;
+            flex-shrink: 0;
+            border-radius: 50%;
+            overflow: hidden;
+            background: #0A7A3C;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+            color: #FFFFFF;
+            cursor: pointer;
+        }
+        .message-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .message-avatar .placeholder { text-transform: uppercase; }
+        .message-content { display: flex; flex-direction: column; max-width: 100%; }
+        .message.me .message-content { align-items: flex-end; }
+        .message .author {
+            font-size: 12px;
+            font-weight: 600;
+            color: #8E8E93;
+            margin-bottom: 2px;
+            padding: 0 4px;
+        }
+        .message.me .author { text-align: right; }
+        .message .author a { color: inherit; text-decoration: none; }
+        .message .bubble {
+            padding: 8px 14px;
+            border-radius: 18px;
+            font-size: 16px;
+            line-height: 1.4;
+            word-wrap: break-word;
+            background: #FFFFFF;
+            color: #1C1C1E;
+            border-bottom-left-radius: 4px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+            transition: background 0.3s, color 0.3s;
+            position: relative;
+            max-width: 100%;
+        }
+        .message.me .bubble {
+            background: #0A7A3C;
+            color: #FFFFFF;
+            border-bottom-right-radius: 4px;
+            border-bottom-left-radius: 18px;
+        }
+        .message .bubble a {
+            color: #0A7A3C;
+            text-decoration: none;
+            word-break: break-all;
+        }
+        .message.me .bubble a { color: #FFFFFF; }
+        .message .reply-preview {
+            font-size: 12px;
+            color: #8E8E93;
+            padding: 4px 8px;
+            border-left: 3px solid #0A7A3C;
+            margin-bottom: 4px;
+            background: rgba(0,0,0,0.02);
+            border-radius: 4px;
+        }
+        .message .time {
+            font-size: 11px;
+            color: #8E8E93;
+            margin-top: 2px;
+            padding: 0 4px;
+            transition: color 0.3s;
+        }
+        .message.me .time { text-align: right; }
+        .message .status-icon {
+            font-size: 12px;
+            margin-left: 4px;
+            color: #8E8E93;
+            transition: color 0.3s;
+        }
+        .message .status-icon.read { color: #0A7A3C; }
+        .message .reactions {
+            display: flex;
+            gap: 2px;
+            margin-top: 2px;
+            flex-wrap: wrap;
+        }
+        .message .reactions .reaction-item {
+            background: rgba(0,0,0,0.04);
+            border-radius: 12px;
+            padding: 1px 8px 1px 6px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            cursor: default;
+            transition: background 0.3s, color 0.3s;
+        }
+        .message .reactions .reaction-item .count {
+            font-size: 11px;
+            color: #8E8E93;
+            transition: color 0.3s;
+        }
+        .message-menu {
+            display: none;
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: #FFFFFF;
+            border-radius: 14px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+            padding: 6px 0;
+            min-width: 150px;
+            z-index: 200;
+            border: 1px solid rgba(0,0,0,0.05);
+            transition: background 0.3s, border-color 0.3s;
+        }
+        .message-menu.active { display: block; }
+        .message-menu button {
+            display: block;
+            width: 100%;
+            padding: 8px 16px;
+            background: none;
+            border: none;
+            text-align: left;
+            font-size: 14px;
+            color: #1C1C1E;
+            cursor: pointer;
+            font-family: inherit;
+            transition: background 0.3s, color 0.3s;
+        }
+        .message-menu button:hover { background: #F2F2F7; }
+        .message-menu button.danger { color: #FF3B30; }
+        .reactions-panel {
+            display: none;
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #FFFFFF;
+            border-radius: 30px;
+            padding: 4px 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            z-index: 150;
+            gap: 2px;
+            border: 1px solid rgba(0,0,0,0.05);
+            margin-bottom: 6px;
+            transition: background 0.3s, border-color 0.3s;
+        }
+        .reactions-panel.active { display: flex; }
+        .reactions-panel button {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 4px 4px;
+            border-radius: 50%;
+            transition: 0.15s;
+            line-height: 1;
+        }
+        .reactions-panel button:active { transform: scale(1.2); }
+        .sticker-panel {
+            display: none;
+            flex-wrap: wrap;
+            gap: 6px;
+            padding: 8px 12px;
+            max-width: 600px;
+            margin: 0 auto;
+            background: #FFFFFF;
+            border-radius: 16px 16px 0 0;
+            max-height: 100px;
+            overflow-y: auto;
+            position: fixed;
+            bottom: 64px;
+            left: 0;
+            right: 0;
+            z-index: 50;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+            transition: background 0.3s;
+        }
+        .sticker-panel img {
+            width: 48px;
+            height: 48px;
+            object-fit: cover;
+            border-radius: 12px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: 0.2s;
+        }
+        .sticker-panel img:active { border-color: #0A7A3C; transform: scale(0.95); }
+
+        /* МЕДИА-СЕТКА */
+        .media-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 6px;
+            max-width: 300px;
+            margin-top: 4px;
+        }
+        .media-grid .media-item {
+            width: 100%;
+            border-radius: 12px;
+            cursor: pointer;
+            object-fit: cover;
+            max-height: 150px;
+            background: #1C1C1E;
+            border: 0.5px solid rgba(0,0,0,0.05);
+        }
+        .media-grid video.media-item {
+            max-height: 200px;
+            background: #000;
+        }
+        .media-grid .media-item:active {
+            transform: scale(0.98);
+        }
+        .message.me .media-grid {
+            justify-items: end;
+        }
+        /* Полноэкранный просмотр */
+        .media-viewer {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.9);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            flex-direction: column;
+        }
+        .media-viewer.active { display: flex; }
+        .media-viewer img {
+            max-width: 100%;
+            max-height: 90%;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+        .media-viewer .close-viewer {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: #FFFFFF;
+            font-size: 30px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            opacity: 0.7;
+        }
+        .media-viewer .close-viewer:hover { opacity: 1; }
+
+        .input-area {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(242,242,247,0.92);
+            backdrop-filter: saturate(180%) blur(20px);
+            border-top: 0.5px solid rgba(0,0,0,0.05);
+            padding: 6px 12px 10px;
+            max-width: 600px;
+            margin: 0 auto;
+            z-index: 60;
+            transition: background 0.3s, border-color 0.3s;
+        }
+        .input-area .input-row {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: #FFFFFF;
+            border-radius: 30px;
+            border: 0.5px solid rgba(0,0,0,0.08);
+            padding: 2px 4px 2px 12px;
+            transition: background 0.3s, border-color 0.3s;
+        }
+        .input-area .input-row:focus-within {
+            border-color: #0A7A3C;
+            box-shadow: 0 0 0 2px rgba(10,122,60,0.1);
+        }
+        .input-area .input-row input {
+            flex: 1;
+            padding: 10px 0;
+            border: none;
+            background: transparent;
+            font-size: 16px;
+            outline: none;
+            color: #1C1C1E;
+            min-height: 38px;
+            font-family: inherit;
+            min-width: 30px;
+        }
+        .input-area .input-row input::placeholder { color: #8E8E93; }
+        .input-area .input-row .action-btn {
+            background: none;
+            border: none;
+            color: #8E8E93;
+            font-size: 18px;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.2s;
+            flex-shrink: 0;
+        }
+        .input-area .input-row .action-btn:active {
+            background: rgba(0,0,0,0.05);
+            transform: scale(0.9);
+        }
+        .input-area .input-row .sticker-btn {
+            background: none;
+            border: none;
+            color: #8E8E93;
+            font-size: 20px;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.2s;
+            flex-shrink: 0;
+        }
+        .input-area .input-row .sticker-btn:active {
+            background: rgba(0,0,0,0.05);
+            transform: scale(0.9);
+        }
+        .input-area .input-row .send-btn {
+            background: #0A7A3C;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: 0.2s;
+            box-shadow: 0 2px 8px rgba(10,122,60,0.2);
+        }
+        .input-area .input-row .send-btn:active { transform: scale(0.9); }
+        .file-input { display: none; }
+
+        .reply-indicator {
+            display: none;
+            padding: 4px 10px;
+            background: #FFFFFF;
+            border-radius: 12px;
+            margin-bottom: 4px;
+            font-size: 12px;
+            color: #8E8E93;
+            border: 0.5px solid rgba(0,0,0,0.05);
+            transition: background 0.3s, color 0.3s, border-color 0.3s;
+        }
+        .reply-indicator.active { display: block; }
+        .reply-indicator .reply-close { cursor: pointer; color: #FF3B30; font-weight: 600; margin-left: 8px; }
+        .typing-indicator {
+            font-size: 13px;
+            color: #8E8E93;
+            padding: 2px 16px;
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto;
+            display: none;
+            position: fixed;
+            bottom: 60px;
+            left: 0;
+            right: 0;
+            z-index: 40;
+            background: rgba(242,242,247,0.8);
+            backdrop-filter: blur(10px);
+            transition: background 0.3s, color 0.3s;
+        }
+        .creator-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #ffd700, #ff6b00);
+            color: #1C1C1E;
+            font-size: 9px;
+            font-weight: 700;
+            padding: 1px 8px;
+            border-radius: 30px;
+            margin-left: 4px;
+            border: 1px solid #ffd700;
+        }
+
+        /* SETTINGS PANEL */
+        .settings-panel {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: 300;
+        }
+        .settings-panel.active { display: block; }
+        .settings-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.3);
+        }
+        .settings-content {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            max-height: 80vh;
+            background: #FFFFFF;
+            border-radius: 20px 20px 0 0;
+            padding: 20px;
+            overflow-y: auto;
+            animation: slideUp 0.3s ease;
+            transition: background 0.3s;
+        }
+        .settings-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+        .settings-header button {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: #8E8E93;
+        }
+        .settings-section { margin-bottom: 16px; }
+        .settings-section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #8E8E93;
+            margin-bottom: 8px;
+        }
+        .settings-member {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 0.5px solid rgba(0,0,0,0.05);
+            font-size: 15px;
+            transition: border-color 0.3s;
+        }
+        .settings-badge {
+            font-size: 11px;
+            background: #0A7A3C;
+            color: white;
+            padding: 2px 10px;
+            border-radius: 30px;
+        }
+        .settings-remove {
+            color: #FF3B30;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 16px;
+        }
+        .settings-content select,
+        .settings-content input[type="number"] {
+            flex: 1;
+            padding: 10px 14px;
+            border-radius: 16px;
+            border: 0.5px solid rgba(0,0,0,0.08);
+            background: #F2F2F7;
+            font-size: 15px;
+            outline: none;
+            font-family: inherit;
+            min-width: 0;
+            transition: background 0.3s, color 0.3s, border-color 0.3s;
+        }
+        .settings-content select:focus,
+        .settings-content input[type="number"]:focus {
+            border-color: #0A7A3C;
+        }
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+
+        @media (max-width: 400px) {
+            .header { padding: 8px 10px 6px; }
+            .header .back { font-size: 18px; margin-right: 6px; }
+            .header .avatar { width: 28px; height: 28px; font-size: 12px; margin-right: 8px; }
+            .header .info .name { font-size: 15px; }
+            .header .info .status { font-size: 10px; }
+            #message-list { padding: 10px 10px 60px; }
+            .message .bubble { font-size: 14px; padding: 6px 10px; }
+            .message-avatar { width: 26px; height: 26px; font-size: 11px; }
+            .input-area { padding: 4px 8px 8px; }
+            .input-area .input-row { padding: 2px 4px 2px 10px; gap: 2px; }
+            .input-area .input-row input { font-size: 14px; padding: 8px 0; min-height: 32px; }
+            .input-area .input-row .action-btn { width: 30px; height: 30px; font-size: 16px; }
+            .input-area .input-row .sticker-btn { width: 30px; height: 30px; font-size: 18px; }
+            .input-area .input-row .send-btn { width: 30px; height: 30px; font-size: 14px; }
+            .sticker-panel img { width: 40px; height: 40px; }
+            .sticker-panel { padding: 6px 8px; max-height: 80px; }
+            .settings-content { padding: 16px; }
+            .settings-member { font-size: 13px; padding: 6px 0; }
+            .settings-content select,
+            .settings-content input[type="number"] { padding: 8px 10px; font-size: 13px; }
+            .settings-content button { padding: 8px 14px; font-size: 13px; }
+            .typing-indicator { font-size: 12px; bottom: 54px; }
+            .reply-indicator { font-size: 11px; padding: 3px 8px; }
+            body { padding-top: 48px; padding-bottom: 56px; }
+            .media-grid { grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); }
+            .media-grid .media-item { max-height: 120px; }
+        }
+    </style>
+</head>
+<body class="{% if theme == 'dark' %}dark{% endif %}">
+    <div class="header">
+        <a href="{% url 'home' %}" class="back">←</a>
+        {% if other_user %}
+            <div class="avatar" onclick="window.location.href='{% url 'user_profile' other_user.id %}'">
+                {% if other_user.profile.avatar %}
+                    <img src="{{ other_user.profile.avatar.url }}" alt="{{ other_user.username }}">
+                {% else %}
+                    <span class="placeholder">{{ other_user.username|slice:":1"|upper }}</span>
+                {% endif %}
+            </div>
+            <div class="info" onclick="window.location.href='{% url 'user_profile' other_user.id %}'">
+                <div class="name">{{ other_user.username }}</div>
+                <div class="status">
+                    {% if other_user.profile.is_online %}
+                        🟢 Онлайн
+                    {% else %}
+                        ⚪ Был(а) {{ other_user.profile.last_seen|date:"d.m.Y H:i" }}
+                    {% endif %}
+                </div>
+            </div>
+        {% else %}
+            <div class="avatar">
+                {% if chat.avatar %}
+                    <img src="{{ chat.avatar.url }}" alt="{{ chat.name }}">
+                {% else %}
+                    <span class="placeholder">{{ chat.name|slice:":1"|upper }}</span>
+                {% endif %}
+            </div>
+            <div class="info">
+                <div class="name">{{ chat.name }}</div>
+                <div class="status">
+                    <span id="member-count">{{ chat.members.count }} участников</span>
+                    <span style="margin-left:8px; font-size:12px; color:#8E8E93;">
+                        🟢 <span id="online-count">0</span> в сети
+                    </span>
+                </div>
+            </div>
+            {% if chat.is_group and chat.created_by == user %}
+                <button class="settings-btn" onclick="toggleSettings()" title="Настройки чата">⚙️</button>
+            {% endif %}
+        {% endif %}
+    </div>
+
+    <div id="typing-indicator" class="typing-indicator"></div>
+
+    <div id="message-list">
+        {% for msg in messages %}
+            <div class="message {% if msg.author == user %}me{% endif %}" data-message-id="{{ msg.id }}" oncontextmenu="event.preventDefault(); showMenu(event, {{ msg.id }})" ontouchstart="handleTouchStart(event, {{ msg.id }})" ontouchend="handleTouchEnd(event)">
+                <div class="message-wrapper">
+                    {% if msg.author != user %}
+                        <div class="message-avatar" onclick="window.location.href='{% url 'user_profile' msg.author.id %}'">
+                            {% if msg.author.profile.avatar %}
+                                <img src="{{ msg.author.profile.avatar.url }}" alt="{{ msg.author.username }}">
+                            {% else %}
+                                <span class="placeholder">{{ msg.author.username|slice:":1"|upper }}</span>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                    <div class="message-content">
+                        <div class="author">
+                            <a href="{% url 'user_profile' msg.author.id %}">{{ msg.author.username }}</a>
+                            {% if msg.author.profile.is_creator %}
+                                <span class="creator-badge">Основатель</span>
+                            {% endif %}
+                        </div>
+                        {% if msg.reply_to %}
+                            <div class="reply-preview">
+                                <span style="font-weight:600;">{{ msg.reply_to.author.username }}</span>
+                                {{ msg.reply_to.content|truncatechars:40 }}
+                            </div>
+                        {% endif %}
+                        <div class="bubble" onclick="handleBubbleClick(event, {{ msg.id }})">
+                            {% if msg.is_media %}
+                                <div class="media-grid">
+                                    {% for url in msg.parsed_content.urls %}
+                                        {% if url|slice:"-4:" == '.mp4' or url|slice:"-4:" == '.mov' or url|slice:"-4:" == '.webm' %}
+                                            <video controls preload="metadata" class="media-item" onclick="event.stopPropagation();">
+                                                <source src="{{ url }}" type="video/mp4">
+                                                Ваш браузер не поддерживает видео
+                                            </video>
+                                        {% else %}
+                                            <img src="{{ url }}" alt="Фото" class="media-item" onclick="event.stopPropagation(); openMedia('{{ url }}')">
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ msg.content|linebreaksbr }}
+                            {% endif %}
+                        </div>
+                        <div style="display:flex; align-items:center; gap:6px; margin-top:2px;">
+                            <div class="time">{{ msg.timestamp|date:"H:i" }}</div>
+                            {% if msg.author == user %}
+                                <span class="status-icon {% if msg.is_read %}read{% endif %}">
+                                    {% if msg.is_read %}✓✓{% else %}✓{% endif %}
+                                </span>
+                            {% endif %}
+                        </div>
+                        {% if msg.reactions %}
+                            <div class="reactions">
+                                {% for user_id, reaction_list in msg.reactions.items %}
+                                    {% for reaction in reaction_list %}
+                                        <span class="reaction-item">
+                                            {{ reaction }}
+                                            <span class="count">{{ msg.reactions.items|length }}</span>
+                                        </span>
+                                    {% endfor %}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="reactions-panel" id="reactions-{{ msg.id }}">
+                    <button onclick="addReaction({{ msg.id }}, '👍')">👍</button>
+                    <button onclick="addReaction({{ msg.id }}, '❤️')">❤️</button>
+                    <button onclick="addReaction({{ msg.id }}, '😂')">😂</button>
+                    <button onclick="addReaction({{ msg.id }}, '😮')">😮</button>
+                    <button onclick="addReaction({{ msg.id }}, '😢')">😢</button>
+                    <button onclick="addReaction({{ msg.id }}, '😡')">😡</button>
+                </div>
+                <div class="message-menu" id="menu-{{ msg.id }}">
+                    <button onclick="replyTo({{ msg.id }})">↩️ Ответить</button>
+                    <button onclick="forwardMessage({{ msg.id }})">↗️ Переслать</button>
+                    {% if msg.author == user %}
+                        <button class="danger" onclick="deleteMessage({{ msg.id }})">🗑️ Удалить</button>
+                    {% endif %}
+                </div>
+            </div>
+        {% empty %}
+            <div style="text-align:center; padding: 40px 0; color: #8E8E93; font-size: 16px;">
+                💬 Нет сообщений
+            </div>
+        {% endfor %}
+    </div>
+
+    <div class="sticker-panel" id="sticker-panel">
+        {% for sticker in stickers %}
+            <img src="{{ sticker.image.url }}" alt="{{ sticker.name }}" onclick="sendSticker('{{ sticker.image.url }}')">
+        {% empty %}
+            <span style="color: #8E8E93; font-size: 14px; padding:8px;">Нет стикеров</span>
+        {% endfor %}
+    </div>
+
+    <div class="input-area">
+        <div style="flex:1; display:flex; flex-direction:column; min-width:0;">
+            <div class="reply-indicator" id="reply-indicator">
+                Ответ на <span id="reply-author"></span>: <span id="reply-preview"></span>
+                <span class="reply-close" onclick="cancelReply()">✕</span>
+            </div>
+            <div class="input-row">
+                <button class="sticker-btn" onclick="toggleStickers()" title="Стикеры">😊</button>
+                <button class="action-btn" onclick="document.getElementById('file-input').click()" title="Фото/Видео (до 5)">📎</button>
+                <button class="action-btn" onclick="setExpiry()" title="Исчезающее">⏳</button>
+                <form method="post" action="{% url 'send_message' chat.id %}" style="display:flex; flex:1; align-items:center; gap:4px; min-width:0;" id="message-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="reply_to" id="reply-to-input" value="">
+                    <input type="hidden" name="expiry" id="expiry-input" value="">
+                    <input type="text" name="content" placeholder="Сообщение..." required id="message-input" style="flex:1; min-width:20px;">
+                    <button type="submit" class="send-btn">➤</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <input type="file" id="file-input" class="file-input" accept="image/*,video/*" multiple>
+
+    <!-- Медиа-просмотрщик -->
+    <div class="media-viewer" id="media-viewer">
+        <button class="close-viewer" onclick="closeMedia()">✕</button>
+        <img id="media-viewer-img" src="" alt="Просмотр">
+    </div>
+
+    <div class="settings-panel" id="settings-panel">
+        <div class="settings-overlay" onclick="toggleSettings()"></div>
+        <div class="settings-content">
+            <div class="settings-header">
+                <span>⚙️ Настройки беседы</span>
+                <button onclick="toggleSettings()">✕</button>
+            </div>
+            <div class="settings-body">
+                <div class="settings-section">
+                    <div class="settings-section-title">👥 Участники ({{ chat.members.count }})</div>
+                    {% for member in chat.members.all %}
+                        <div class="settings-member">
+                            <span>{{ member.username }}</span>
+                            {% if member == chat.created_by %}
+                                <span class="settings-badge">Создатель</span>
+                            {% endif %}
+                            {% if member != chat.created_by and chat.created_by == user %}
+                                <a href="{% url 'remove_member' chat.id member.id %}" class="settings-remove" onclick="return confirm('Исключить {{ member.username }}?')">✕</a>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+                {% if chat.created_by == user %}
+                    <div class="settings-section">
+                        <div class="settings-section-title">➕ Добавить участника</div>
+                        <form method="post" action="{% url 'add_member' chat.id %}" style="display:flex; gap:8px;">
+                            {% csrf_token %}
+                            <select name="user_id">
+                                <option value="">-- Выберите друга --</option>
+                                {% for friend in friends %}
+                                    {% if friend.friend not in chat.members.all %}
+                                        <option value="{{ friend.friend.id }}">{{ friend.friend.username }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                            <button type="submit" style="background:#0A7A3C; color:white; border:none; border-radius:30px; padding:10px 20px; font-weight:600; cursor:pointer;">Добавить</button>
+                        </form>
+                    </div>
+                    <div class="settings-section">
+                        <div class="settings-section-title">⏱️ Тайминг (anti-spam)</div>
+                        <form method="post" action="{% url 'chat_settings' chat.id %}" style="display:flex; gap:8px; align-items:center;">
+                            {% csrf_token %}
+                            <input type="number" name="slow_mode" value="{{ chat.slow_mode }}" min="0" max="3600" style="flex:1; min-width:50px; width:70px;">
+                            <span style="font-size:13px; color:#8E8E93;">сек</span>
+                            <button type="submit" style="background:#0A7A3C; color:white; border:none; border-radius:30px; padding:10px 20px; font-weight:600; cursor:pointer;">Сохранить</button>
+                        </form>
+                    </div>
+                    <div class="settings-section" style="border-top:0.5px solid rgba(0,0,0,0.05); padding-top:16px;">
+                        <a href="{% url 'delete_chat' chat.id %}" style="color:#FF3B30; text-decoration:none; font-weight:600;" onclick="return confirm('Удалить беседу навсегда?')">🗑️ Удалить беседу</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/static/sw.js')
+                .then(function(reg) { console.log('Service Worker зарегистрирован!'); })
+                .catch(function(err) { console.log('Ошибка регистрации SW:', err); });
+        }
+
+        const theme = document.cookie.split('; ').find(row => row.startsWith('theme='))?.split('=')[1] || 'light';
+        if (theme === 'dark') { document.body.classList.add('dark'); }
+
+        function updateOnlineCount() {
+            const chatId = {{ chat.id }};
+            fetch(`/get_online_members/${chatId}/`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('online-count').textContent = data.online_count || 0;
+                })
+                .catch(() => {});
+        }
+        setInterval(updateOnlineCount, 10000);
+        updateOnlineCount();
+
+        function toggleSettings() {
+            document.getElementById('settings-panel').classList.toggle('active');
+        }
+
+        // --- Отправка файлов (до 5) ---
+        document.getElementById('file-input').addEventListener('change', function() {
+            const files = this.files;
+            if (files.length === 0) return;
+            
+            if (files.length > 5) {
+                alert('Можно отправить не более 5 файлов за раз');
+                this.value = '';
+                return;
+            }
+            
+            const formData = new FormData();
+            for (let i = 0; i < files.length; i++) {
+                formData.append('files', files[i]);
+            }
+            const chatId = {{ chat.id }};
+            fetch(`/upload_file/${chatId}/`, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value,
+                }
+            })
+            .then(response => window.location.reload());
+            this.value = '';
+        });
+
+        // --- Медиа-просмотрщик ---
+        function openMedia(url) {
+            const viewer = document.getElementById('media-viewer');
+            const img = document.getElementById('media-viewer-img');
+            img.src = url;
+            viewer.classList.add('active');
+        }
+
+        function closeMedia() {
+            document.getElementById('media-viewer').classList.remove('active');
+            document.getElementById('media-viewer-img').src = '';
+        }
+
+        document.getElementById('media-viewer')?.addEventListener('click', function(e) {
+            if (e.target === this) closeMedia();
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeMedia();
+        });
+
+        function setExpiry() {
+            const seconds = prompt('Через сколько секунд исчезнет сообщение? (5-60):', '30');
+            if (seconds && parseInt(seconds) >= 5 && parseInt(seconds) <= 3600) {
+                document.getElementById('expiry-input').value = seconds;
+            }
+        }
+
+        function toggleStickers() {
+            const panel = document.getElementById('sticker-panel');
+            panel.style.display = panel.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        function sendSticker(imageUrl) {
+            document.getElementById('message-input').value = '🖼 ' + imageUrl;
+            document.getElementById('message-form').submit();
+        }
+
+        let longPressTimer, isLongPress = false, longPressMessageId = null;
+        function handleTouchStart(event, messageId) {
+            isLongPress = false;
+            longPressMessageId = messageId;
+            longPressTimer = setTimeout(() => {
+                isLongPress = true;
+                showMenu(event, messageId);
+            }, 600);
+        }
+        function handleTouchEnd(event) {
+            clearTimeout(longPressTimer);
+            longPressMessageId = null;
+        }
+        function handleBubbleClick(event, messageId) {
+            if (!isLongPress) { toggleReactionPanel(messageId); }
+            isLongPress = false;
+        }
+
+        function toggleReactionPanel(messageId) {
+            const panel = document.getElementById(`reactions-${messageId}`);
+            if (panel) {
+                document.querySelectorAll('.reactions-panel.active').forEach(p => {
+                    if (p.id !== `reactions-${messageId}`) p.classList.remove('active');
+                });
+                panel.classList.toggle('active');
+            }
+        }
+
+        function addReaction(messageId, reaction) {
+            fetch(`/add_reaction/${messageId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value,
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({ reaction: reaction })
+            })
+            .then(response => window.location.reload());
+        }
+
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.reactions-panel') && !e.target.closest('.reaction-item')) {
+                document.querySelectorAll('.reactions-panel.active').forEach(p => p.classList.remove('active'));
+            }
+            if (!e.target.closest('.message-menu')) {
+                document.querySelectorAll('.message-menu.active').forEach(m => m.classList.remove('active'));
+            }
+        });
+
+        function showMenu(event, messageId) {
+            event.preventDefault();
+            const menu = document.getElementById(`menu-${messageId}`);
+            if (menu) {
+                document.querySelectorAll('.message-menu.active').forEach(m => m.classList.remove('active'));
+                menu.classList.toggle('active');
+            }
+        }
+
+        function replyTo(messageId) {
+            const msg = document.querySelector(`.message[data-message-id="${messageId}"]`);
+            if (msg) {
+                const author = msg.querySelector('.author a')?.textContent || 'Пользователь';
+                const content = msg.querySelector('.bubble')?.textContent || '';
+                document.getElementById('reply-author').textContent = author;
+                document.getElementById('reply-preview').textContent = content.substring(0, 50);
+                document.getElementById('reply-indicator').classList.add('active');
+                document.getElementById('reply-to-input').value = messageId;
+                document.getElementById('message-input').focus();
+                document.querySelectorAll('.message-menu.active').forEach(m => m.classList.remove('active'));
+            }
+        }
+
+        function cancelReply() {
+            document.getElementById('reply-indicator').classList.remove('active');
+            document.getElementById('reply-to-input').value = '';
+        }
+
+        function forwardMessage(messageId) {
+            window.location.href = `/forward/${messageId}/`;
+        }
+
+        function deleteMessage(messageId) {
+            if (confirm('Удалить сообщение?')) {
+                window.location.href = `/delete_message/${messageId}/`;
+            }
+        }
+
+        function scrollToBottom() {
+            const messages = document.getElementById('message-list');
+            if (messages) { setTimeout(() => messages.scrollTop = messages.scrollHeight, 100); }
+        }
+
+        function getLastMessageId() {
+            const messages = document.querySelectorAll('.message');
+            if (messages.length > 0) {
+                const last = messages[messages.length - 1];
+                return parseInt(last.dataset.messageId) || 0;
+            }
+            return 0;
+        }
+
+        let typingTimeout;
+        document.getElementById('message-input').addEventListener('input', function() {
+            clearTimeout(typingTimeout);
+            const chatId = {{ chat.id }};
+            fetch(`/typing/${chatId}/`, {
+                method: 'POST',
+                headers: { 'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value }
+            });
+            typingTimeout = setTimeout(() => {
+                fetch(`/stop_typing/${chatId}/`, {
+                    method: 'POST',
+                    headers: { 'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value }
+                });
+            }, 2000);
+        });
+
+        function showTyping() {
+            const chatId = {{ chat.id }};
+            fetch(`/typing/${chatId}/`)
+                .then(response => response.json())
+                .then(data => {
+                    const typingDiv = document.getElementById('typing-indicator');
+                    if (data.typing && data.typing.length > 0) {
+                        typingDiv.textContent = `${data.typing.join(', ')} печатает...`;
+                        typingDiv.style.display = 'block';
+                    } else {
+                        typingDiv.style.display = 'none';
+                    }
+                });
+        }
+
+        function notifyNewMessage() {
+            if (navigator.vibrate) navigator.vibrate(100);
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+                oscillator.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                oscillator.frequency.value = 800;
+                oscillator.type = 'sine';
+                gainNode.gain.value = 0.3;
+                oscillator.start();
+                oscillator.stop(audioCtx.currentTime + 0.1);
+            } catch(e) {}
+        }
+
+        function checkNewMessages() {
+            const chatId = {{ chat.id }};
+            const lastId = getLastMessageId();
+            fetch(`/get_new_messages/${chatId}/?last_id=${lastId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.messages && data.messages.length > 0) {
+                        notifyNewMessage();
+                        const messageList = document.getElementById('message-list');
+                        data.messages.forEach(msg => {
+                            const div = document.createElement('div');
+                            div.className = `message ${msg.is_me ? 'me' : ''}`;
+                            div.dataset.messageId = msg.id;
+                            div.oncontextmenu = function(e) { e.preventDefault(); showMenu(e, msg.id); };
+                            div.ontouchstart = function(e) { handleTouchStart(e, msg.id); };
+                            div.ontouchend = handleTouchEnd;
+
+                            let avatarHtml = '';
+                            if (!msg.is_me) {
+                                const avatarUrl = msg.avatar_url || '';
+                                const initial = msg.username ? msg.username.slice(0, 1).toUpperCase() : '?';
+                                avatarHtml = `
+                                    <div class="message-avatar" onclick="window.location.href='/user/${msg.author_id}/'">
+                                        ${avatarUrl ? `<img src="${avatarUrl}" alt="${msg.username}">` : `<span class="placeholder">${initial}</span>`}
+                                    </div>
+                                `;
+                            }
+
+                            let replyHtml = '';
+                            if (msg.reply_to) {
+                                replyHtml = `
+                                    <div class="reply-preview">
+                                        <span style="font-weight:600;">${msg.reply_author}</span>
+                                        ${msg.reply_content}
+                                    </div>
+                                `;
+                            }
+
+                            let reactionsHtml = '';
+                            if (msg.reactions) {
+                                const reactionKeys = Object.values(msg.reactions).flat();
+                                const reactionCount = reactionKeys.length;
+                                const displayReaction = reactionKeys.length > 0 ? reactionKeys[0] : '';
+                                if (reactionCount > 0) {
+                                    reactionsHtml = `
+                                        <div class="reactions">
+                                            <span class="reaction-item">
+                                                ${displayReaction}
+                                                <span class="count">${reactionCount}</span>
+                                            </span>
+                                        </div>
+                                    `;
+                                }
+                            }
+
+                            div.innerHTML = `
+                                <div class="message-wrapper">
+                                    ${avatarHtml}
+                                    <div class="message-content">
+                                        <div class="author">
+                                            <a href="/user/${msg.author_id}/">${msg.username}</a>
+                                            ${msg.is_creator ? '<span class="creator-badge">Основатель</span>' : ''}
+                                        </div>
+                                        ${replyHtml}
+                                        <div class="bubble" onclick="handleBubbleClick(event, ${msg.id})">
+                                            ${msg.content}
+                                        </div>
+                                        <div style="display:flex; align-items:center; gap:6px; margin-top:2px;">
+                                            <div class="time">${msg.time}</div>
+                                            ${msg.is_me ? `<span class="status-icon ${msg.is_read ? 'read' : ''}">${msg.is_read ? '✓✓' : '✓'}</span>` : ''}
+                                        </div>
+                                        ${reactionsHtml}
+                                    </div>
+                                </div>
+                                <div class="reactions-panel" id="reactions-${msg.id}">
+                                    <button onclick="addReaction(${msg.id}, '👍')">👍</button>
+                                    <button onclick="addReaction(${msg.id}, '❤️')">❤️</button>
+                                    <button onclick="addReaction(${msg.id}, '😂')">😂</button>
+                                    <button onclick="addReaction(${msg.id}, '😮')">😮</button>
+                                    <button onclick="addReaction(${msg.id}, '😢')">😢</button>
+                                    <button onclick="addReaction(${msg.id}, '😡')">😡</button>
+                                </div>
+                                <div class="message-menu" id="menu-${msg.id}">
+                                    <button onclick="replyTo(${msg.id})">↩️ Ответить</button>
+                                    <button onclick="forwardMessage(${msg.id})">↗️ Переслать</button>
+                                    ${msg.is_me ? `<button class="danger" onclick="deleteMessage(${msg.id})">🗑️ Удалить</button>` : ''}
+                                </div>
+                            `;
+                            messageList.appendChild(div);
+                        });
+                        setTimeout(scrollToBottom, 150);
+                    }
+                });
+        }
+
+        document.getElementById('message-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const form = this;
+            const formData = new FormData(form);
+            const input = document.getElementById('message-input');
+            fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message_id) {
+                    input.value = '';
+                    document.getElementById('expiry-input').value = '';
+                    cancelReply();
+                    setTimeout(checkNewMessages, 200);
+                    setTimeout(scrollToBottom, 300);
+                }
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(scrollToBottom, 200);
+        });
+        window.addEventListener('load', function() {
+            setTimeout(scrollToBottom, 300);
+        });
+        setInterval(checkNewMessages, 5000);
+        setInterval(showTyping, 2000);
+    </script>
+</body>
+</html>

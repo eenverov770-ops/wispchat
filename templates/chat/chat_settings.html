@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Wisp — Настройки чата</title>
+    <link rel="manifest" href="/static/manifest.json">
+    <link rel="apple-touch-icon" href="/static/icons/icon-192.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Wisp">
+    <meta name="theme-color" content="#1C1C1E">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: #F2F2F7;
+            color: #1C1C1E;
+            padding-top: 54px;
+            padding-bottom: 80px;
+            transition: background 0.3s, color 0.3s;
+        }
+        body.dark {
+            background: #0A0A0A;
+            color: #F5F5F7;
+        }
+        body.dark .header {
+            background: #1C1C1E;
+        }
+        body.dark .header .back { color: #F5F5F7; }
+        body.dark .header .title { color: #F5F5F7; }
+        body.dark .settings-card {
+            background: #1C1C1E;
+        }
+        body.dark .field label { color: #F5F5F7; }
+        body.dark .field input {
+            background: #2C2C2E;
+            color: #F5F5F7;
+            border: 0.5px solid rgba(255,255,255,0.05);
+        }
+        body.dark .field input:focus {
+            border-color: #0A7A3C;
+            background: #1C1C1E;
+        }
+        body.dark .btn-save {
+            background: #0A7A3C;
+            color: #F5F5F7;
+        }
+        body.dark .btn-danger {
+            background: #FF3B30;
+            color: #F5F5F7;
+        }
+        body.dark .member-item {
+            background: #2C2C2E;
+        }
+        body.dark .member-item .name { color: #F5F5F7; }
+        body.dark .messages {
+            background: #2C2C2E;
+            color: #F5F5F7;
+        }
+        .header {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            background: #1C1C1E;
+            padding: 10px 16px 8px;
+            display: flex;
+            align-items: center;
+            border-bottom: none;
+            z-index: 100;
+            max-width: 600px;
+            margin: 0 auto;
+            transition: background 0.3s;
+        }
+        .header .back {
+            font-size: 22px;
+            color: #FFFFFF;
+            text-decoration: none;
+            margin-right: 12px;
+            opacity: 0.8;
+            transition: color 0.3s;
+        }
+        .header .back:active { opacity: 0.5; }
+        .header .title {
+            font-size: 17px;
+            font-weight: 600;
+            color: #FFFFFF;
+            transition: color 0.3s;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 16px;
+        }
+        .settings-card {
+            background: #FFFFFF;
+            border-radius: 24px;
+            padding: 24px 20px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+            transition: background 0.3s;
+            margin-bottom: 16px;
+        }
+        .settings-card h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+        .field {
+            margin-bottom: 16px;
+        }
+        .field label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: #1C1C1E;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+        .field input {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 16px;
+            border: 0.5px solid rgba(0,0,0,0.08);
+            background: #F2F2F7;
+            font-size: 16px;
+            outline: none;
+            color: #1C1C1E;
+            font-family: inherit;
+            transition: background 0.3s, color 0.3s, border-color 0.3s;
+        }
+        .field input:focus {
+            border-color: #0A7A3C;
+            background: #FFFFFF;
+        }
+        .btn-save {
+            width: 100%;
+            padding: 14px;
+            background: #0A7A3C;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-top: 8px;
+            box-shadow: 0 4px 16px rgba(10,122,60,0.2);
+        }
+        .btn-save:active { transform: scale(0.95); opacity: 0.9; }
+        .btn-danger {
+            width: 100%;
+            padding: 14px;
+            background: #FF3B30;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-top: 8px;
+        }
+        .btn-danger:active { transform: scale(0.95); opacity: 0.9; }
+        .member-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: #F2F2F7;
+            border-radius: 12px;
+            margin-bottom: 6px;
+            transition: background 0.3s;
+        }
+        .member-item .name {
+            font-weight: 600;
+            color: #1C1C1E;
+            transition: color 0.3s;
+        }
+        .member-item .role {
+            font-size: 12px;
+            color: #8E8E93;
+        }
+        .member-item .btn-remove {
+            background: #FF3B30;
+            color: white;
+            border: none;
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            text-decoration: none;
+        }
+        .member-item .btn-remove:active { transform: scale(0.95); opacity: 0.8; }
+        .member-item .creator-badge {
+            background: #0A7A3C;
+            color: white;
+            padding: 2px 10px;
+            border-radius: 30px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .messages {
+            background: #E5E5EA;
+            padding: 12px 16px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            color: #1C1C1E;
+            font-size: 15px;
+            transition: background 0.3s, color 0.3s;
+        }
+        .section-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #8E8E93;
+            margin-bottom: 12px;
+            margin-top: 16px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+    </style>
+</head>
+<body class="{% if theme == 'dark' %}dark{% endif %}">
+    <div class="header">
+        <a href="{% url 'chat_detail' chat.id %}" class="back">←</a>
+        <span class="title">Настройки чата</span>
+    </div>
+    <div class="container">
+        {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    {{ message }}
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div class="settings-card">
+            <h3>👥 Участники ({{ chat.members.count }})</h3>
+            {% for member in chat.members.all %}
+                <div class="member-item">
+                    <div>
+                        <span class="name">{{ member.username }}</span>
+                        {% if member == chat.created_by %}
+                            <span class="creator-badge">Создатель</span>
+                        {% endif %}
+                    </div>
+                    {% if member != chat.created_by and chat.created_by == user %}
+                        <a href="{% url 'remove_member' chat.id member.id %}" class="btn-remove" onclick="return confirm('Исключить {{ member.username }} из чата?')">✕</a>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+
+        {% if chat.created_by == user %}
+            <div class="settings-card">
+                <h3>➕ Добавить участника</h3>
+                <form method="post" action="{% url 'add_member' chat.id %}">
+                    {% csrf_token %}
+                    <div class="field">
+                        <label>Выберите друга</label>
+                        <select name="user_id" required>
+                            <option value="">-- Выберите --</option>
+                            {% for friend in friends %}
+                                {% if friend.friend not in chat.members.all %}
+                                    <option value="{{ friend.friend.id }}">{{ friend.friend.username }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <button type="submit" class="btn-save">➕ Добавить</button>
+                </form>
+            </div>
+
+            <div class="settings-card">
+                <h3>⏱️ Тайминг сообщений</h3>
+                <form method="post" action="{% url 'chat_settings' chat.id %}">
+                    {% csrf_token %}
+                    <div class="field">
+                        <label>Задержка между сообщениями (сек)</label>
+                        <input type="number" name="slow_mode" value="{{ chat.slow_mode }}" min="0" max="3600">
+                        <span style="font-size:12px; color:#8E8E93;">0 — отключено</span>
+                    </div>
+                    <button type="submit" class="btn-save">💾 Сохранить</button>
+                </form>
+            </div>
+
+            <div class="settings-card">
+                <h3>⚠️ Опасная зона</h3>
+                <a href="{% url 'delete_chat' chat.id %}" class="btn-danger" onclick="return confirm('Удалить чат {{ chat.name }} навсегда?')">🗑️ Удалить чат</a>
+            </div>
+        {% endif %}
+    </div>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/static/sw.js')
+                .then(r => console.log('SW ok'))
+                .catch(e => console.log('SW err', e));
+        }
+        const theme = document.cookie.split('; ').find(row => row.startsWith('theme='))?.split('=')[1] || 'light';
+        if (theme === 'dark') { document.body.classList.add('dark'); }
+    </script>
+</body>
+</html>
