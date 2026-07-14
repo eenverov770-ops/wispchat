@@ -2,15 +2,17 @@ services:
   - type: web
     name: wispchat
     runtime: python
-    buildCommand: pip install -r requirements.txt && python manage.py collectstatic --noinput
+    buildCommand: pip install -r requirements.txt --verbose && python manage.py collectstatic --noinput
     startCommand: gunicorn mychat.wsgi:application
     envVars:
       - key: SECRET_KEY
         generateValue: true
       - key: DEBUG
-        value: "False"
+        value: "True"
       - key: ALLOWED_HOSTS
         value: ".onrender.com"
       - key: PYTHON_VERSION
         value: "3.12.4"
+      - key: DISABLE_COLLECTSTATIC
+        value: "1"
     plan: free
