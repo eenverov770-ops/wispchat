@@ -1,0 +1,11 @@
+asgiref<4,>=3.8.1
+sqlparse>=0.3.1
+
+[:sys_platform == "win32"]
+tzdata
+
+[argon2]
+argon2-cffi>=19.1.0
+
+[bcrypt]
+bcrypt

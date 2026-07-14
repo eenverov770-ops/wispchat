@@ -1,0 +1,180 @@
+/* WispChat Admin Style */
+:root {
+    --primary: #1C1C1E;
+    --secondary: #0A7A3C;
+    --background: #0A0A0A;
+    --surface: #1C1C1E;
+    --text: #F5F5F7;
+    --text-secondary: #8E8E93;
+    --accent: #0A7A3C;
+    --accent-hover: #064F26;
+    --danger: #FF3B30;
+    --border-radius: 16px;
+}
+
+#header {
+    background: var(--primary) !important;
+    border-radius: var(--border-radius) var(--border-radius) 0 0 !important;
+    padding: 12px 24px !important;
+    border-bottom: 0.5px solid rgba(255,255,255,0.05) !important;
+}
+
+#branding h1 {
+    color: var(--text) !important;
+    font-weight: 700 !important;
+}
+
+#branding h1:before {
+    content: "W";
+    display: inline-block;
+    background: var(--accent);
+    color: white;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    text-align: center;
+    line-height: 32px;
+    font-size: 18px;
+    font-weight: 800;
+    margin-right: 10px;
+    box-shadow: 0 4px 12px rgba(10, 122, 60, 0.3);
+}
+
+#user-tools {
+    color: var(--text-secondary) !important;
+}
+
+#user-tools a {
+    color: var(--text) !important;
+    text-decoration: none;
+    padding: 4px 12px;
+    border-radius: 30px;
+    background: rgba(255,255,255,0.05);
+    transition: 0.2s;
+}
+
+#user-tools a:hover {
+    background: rgba(255,255,255,0.1);
+}
+
+#content {
+    background: var(--background) !important;
+    padding: 24px !important;
+    border-radius: 0 0 var(--border-radius) var(--border-radius) !important;
+}
+
+#content-main {
+    background: var(--surface) !important;
+    border-radius: var(--border-radius) !important;
+    padding: 24px !important;
+}
+
+.module {
+    background: var(--surface) !important;
+    border-radius: var(--border-radius) !important;
+    border: 0.5px solid rgba(255,255,255,0.05) !important;
+}
+
+.module h2, .module caption, .inline-group h2 {
+    background: var(--surface) !important;
+    color: var(--text) !important;
+    border-radius: var(--border-radius) !important;
+    padding: 12px 16px !important;
+    border-bottom: 0.5px solid rgba(255,255,255,0.05) !important;
+}
+
+.module table {
+    background: var(--surface) !important;
+    border-radius: var(--border-radius) !important;
+}
+
+.module th {
+    color: var(--text-secondary) !important;
+    font-weight: 600 !important;
+}
+
+.module td {
+    color: var(--text) !important;
+    border-bottom: 0.5px solid rgba(255,255,255,0.05) !important;
+}
+
+a {
+    color: var(--accent) !important;
+    text-decoration: none !important;
+}
+
+a:hover {
+    color: var(--accent-hover) !important;
+}
+
+.button, input[type=submit], input[type=button], .submit-row input, a.button {
+    background: var(--accent) !important;
+    color: var(--text) !important;
+    border: none !important;
+    border-radius: 30px !important;
+    padding: 8px 20px !important;
+    font-weight: 600 !important;
+    transition: 0.2s !important;
+}
+
+.button:hover, input[type=submit]:hover, input[type=button]:hover, .submit-row input:hover, a.button:hover {
+    background: var(--accent-hover) !important;
+    transform: scale(0.97);
+}
+
+.deletelink {
+    color: var(--danger) !important;
+}
+
+.deletelink:hover {
+    color: #CC0000 !important;
+}
+
+.breadcrumbs {
+    background: var(--surface) !important;
+    color: var(--text-secondary) !important;
+    border-radius: var(--border-radius) !important;
+    padding: 8px 16px !important;
+    margin-bottom: 16px !important;
+    border: 0.5px solid rgba(255,255,255,0.05) !important;
+}
+
+.breadcrumbs a {
+    color: var(--text) !important;
+}
+
+.breadcrumbs a:hover {
+    color: var(--accent) !important;
+}
+
+.submit-row {
+    background: transparent !important;
+    border: none !important;
+    padding: 12px 0 !important;
+}
+
+/* Скролл */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: var(--surface);
+    border-radius: 10px;
+}
+::-webkit-scrollbar-thumb {
+    background: var(--accent);
+    border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-hover);
+}
+
+body {
+    background: var(--background) !important;
+    color: var(--text) !important;
+}
+
+.dashboard #content {
+    background: var(--background) !important;
+}

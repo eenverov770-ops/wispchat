@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Wisp — Друзья</title>
+    <link rel="manifest" href="/static/manifest.json">
+    <link rel="apple-touch-icon" href="/static/icons/icon-192.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Wisp">
+    <meta name="theme-color" content="#1C1C1E">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: #F2F2F7;
+            color: #1C1C1E;
+            padding-top: 54px;
+            padding-bottom: 80px;
+            transition: background 0.3s, color 0.3s;
+        }
+        body.dark {
+            background: #0A0A0A;
+            color: #F5F5F7;
+        }
+        body.dark .header {
+            background: #1C1C1E;
+        }
+        body.dark .header .back { color: #F5F5F7; }
+        body.dark .header .title { color: #F5F5F7; }
+        body.dark .search-box input {
+            background: #1C1C1E;
+            color: #F5F5F7;
+            border: 0.5px solid rgba(255,255,255,0.05);
+        }
+        body.dark .user-item {
+            background: #1C1C1E;
+        }
+        body.dark .user-item .username { color: #F5F5F7; }
+        body.dark .btn-chat {
+            background: #2C2C2E;
+            color: #F5F5F7;
+        }
+        body.dark .section-title { color: #8E8E93; }
+        body.dark .empty { color: #8E8E93; }
+        .header {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            background: #1C1C1E;
+            padding: 10px 16px 8px;
+            display: flex;
+            align-items: center;
+            border-bottom: none;
+            z-index: 100;
+            max-width: 600px;
+            margin: 0 auto;
+            transition: background 0.3s;
+        }
+        .header .back {
+            font-size: 22px;
+            color: #FFFFFF;
+            text-decoration: none;
+            margin-right: 12px;
+            opacity: 0.8;
+            transition: color 0.3s;
+        }
+        .header .back:active { opacity: 0.5; }
+        .header .title {
+            font-size: 17px;
+            font-weight: 600;
+            color: #FFFFFF;
+            transition: color 0.3s;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 16px;
+        }
+        .search-box { margin-bottom: 20px; }
+        .search-box input {
+            width: 100%;
+            padding: 14px 16px;
+            border-radius: 30px;
+            border: 0.5px solid rgba(0,0,0,0.05);
+            background: #FFFFFF;
+            font-size: 16px;
+            outline: none;
+            color: #1C1C1E;
+            font-family: inherit;
+            transition: 0.2s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+        }
+        .search-box input:focus {
+            border-color: #0A7A3C;
+            box-shadow: 0 0 0 3px rgba(10,122,60,0.08);
+        }
+        .section-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #8E8E93;
+            margin-bottom: 12px;
+            margin-top: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: color 0.3s;
+        }
+        .user-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 12px;
+            background: #FFFFFF;
+            border-radius: 16px;
+            margin-bottom: 6px;
+            transition: 0.15s;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.02);
+        }
+        .user-item:active { transform: scale(0.98); }
+        .user-item .info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .user-item .avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #0A7A3C, #064F26);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 600;
+            color: #FFFFFF;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+        .user-item .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+        .user-item .username {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1C1C1E;
+            transition: color 0.3s;
+        }
+        .user-item .email { font-size: 13px; color: #8E8E93; }
+        .user-item .actions {
+            display: flex;
+            gap: 8px;
+        }
+        .btn-add {
+            background: #0A7A3C;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: 0.2s;
+        }
+        .btn-add:active { transform: scale(0.95); opacity: 0.8; }
+        .btn-chat {
+            background: #F2F2F7;
+            color: #1C1C1E;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: 0.2s;
+        }
+        .btn-chat:active { transform: scale(0.95); opacity: 0.8; }
+        .btn-delete {
+            background: #FF3B30;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: 0.2s;
+        }
+        .btn-delete:active { transform: scale(0.95); opacity: 0.8; }
+        .empty {
+            text-align: center;
+            padding: 40px 0;
+            color: #8E8E93;
+            transition: color 0.3s;
+        }
+        .empty span { font-size: 48px; display: block; margin-bottom: 12px; }
+    </style>
+</head>
+<body class="{% if theme == 'dark' %}dark{% endif %}">
+    <div class="header">
+        <a href="{% url 'home' %}" class="back">←</a>
+        <span class="title">Друзья</span>
+    </div>
+    <div class="container">
+        <div class="search-box">
+            <form method="get">
+                <input type="text" name="q" placeholder="🔍 Поиск по имени или email..." value="{{ query }}">
+            </form>
+        </div>
+
+        {% if query %}
+            <div class="section-title">Результаты поиска</div>
+            {% if users %}
+                {% for user in users %}
+                    <div class="user-item">
+                        <div class="info">
+                            <div class="avatar">
+                                {% if user.profile.avatar %}
+                                    <img src="{{ user.profile.avatar.url }}" alt="{{ user.username }}">
+                                {% else %}
+                                    {{ user.username|slice:":1"|upper }}
+                                {% endif %}
+                            </div>
+                            <div>
+                                <div class="username">{{ user.username }}</div>
+                                <div class="email">{{ user.email }}</div>
+                            </div>
+                        </div>
+                        <div class="actions">
+                            <a href="{% url 'send_friend_request' user.id %}" class="btn-add">➕ Добавить</a>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty"><span>🔍</span>Пользователи не найдены</div>
+            {% endif %}
+        {% endif %}
+
+        <div class="section-title">👥 Мои друзья ({{ friends|length }})</div>
+        {% if friends %}
+            {% for friend in friends %}
+                <div class="user-item">
+                    <div class="info">
+                        <div class="avatar">
+                            {% if friend.friend.profile.avatar %}
+                                <img src="{{ friend.friend.profile.avatar.url }}" alt="{{ friend.friend.username }}">
+                            {% else %}
+                                {{ friend.friend.username|slice:":1"|upper }}
+                            {% endif %}
+                        </div>
+                        <div>
+                            <div class="username">{{ friend.friend.username }}</div>
+                            <div class="email">{{ friend.friend.email }}</div>
+                        </div>
+                    </div>
+                    <div class="actions">
+                        <a href="{% url 'start_private_chat' friend.friend.id %}" class="btn-chat">💬</a>
+                        <a href="{% url 'delete_friend' friend.friend.id %}" class="btn-delete" onclick="return confirm('Удалить друга?')">✕</a>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty"><span>👤</span>У вас пока нет друзей</div>
+        {% endif %}
+    </div>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/static/sw.js')
+                .then(r => console.log('SW ok'))
+                .catch(e => console.log('SW err', e));
+        }
+        const theme = document.cookie.split('; ').find(row => row.startsWith('theme='))?.split('=')[1] || 'light';
+        if (theme === 'dark') { document.body.classList.add('dark'); }
+    </script>
+</body>
+</html>

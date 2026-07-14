@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Создать стикер</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: #f5f5f7;
+            color: #1c1c1e;
+            padding-top: 54px;
+            padding-bottom: 80px;
+        }
+        body.dark {
+            background: #1c1c1e;
+            color: #f5f5f7;
+        }
+        body.dark .header {
+            background: rgba(28,28,30,0.92);
+            border-bottom: 0.5px solid rgba(255,255,255,0.1);
+        }
+        body.dark .card {
+            background: #2c2c2e;
+        }
+        body.dark .field input, body.dark .field select {
+            background: #1c1c1e;
+            color: #f5f5f7;
+            border: 0.5px solid rgba(255,255,255,0.1);
+        }
+        body.dark .btn {
+            background: #2c2c2e;
+            color: #f5f5f7;
+        }
+        .header {
+            position: fixed; top: 0; left: 0; right: 0;
+            background: rgba(245,245,247,0.92);
+            backdrop-filter: saturate(180%) blur(20px);
+            padding: 10px 16px 8px;
+            display: flex;
+            align-items: center;
+            border-bottom: 0.5px solid rgba(0,0,0,0.05);
+            z-index: 100;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .header .back {
+            font-size: 24px;
+            color: #1c1c1e;
+            text-decoration: none;
+            margin-right: 12px;
+        }
+        .header .title {
+            font-size: 17px;
+            font-weight: 600;
+            color: #1c1c1e;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 16px;
+        }
+        .card {
+            background: #ffffff;
+            border-radius: 24px;
+            padding: 24px 20px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+            transition: background 0.3s;
+        }
+        .field {
+            margin-bottom: 18px;
+        }
+        .field label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 4px;
+            font-size: 14px;
+            color: #1c1c1e;
+        }
+        .field input, .field select {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 16px;
+            border: 0.5px solid rgba(0,0,0,0.08);
+            background: #f8f8fc;
+            font-size: 16px;
+            outline: none;
+            color: #1c1c1e;
+            transition: background 0.3s, color 0.3s, border-color 0.3s;
+        }
+        .field input:focus, .field select:focus {
+            border-color: #8e8e93;
+            background: #ffffff;
+        }
+        .field input[type="file"] {
+            padding: 10px;
+        }
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: #1c1c1e;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-top: 8px;
+        }
+        .btn:active { transform: scale(0.95); opacity: 0.8; }
+        .messages {
+            background: #e5e5ea;
+            padding: 12px 16px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            color: #1c1c1e;
+            font-size: 15px;
+        }
+        body.dark .messages {
+            background: #2c2c2e;
+            color: #f5f5f7;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="{% url 'profile' %}" class="back">←</a>
+        <span class="title">Добавить стикер</span>
+    </div>
+    <div class="container">
+        <div class="card">
+            {% if messages %}
+                <div class="messages">
+                    {% for message in messages %}
+                        {{ message }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="field">
+                    <label>Название стикера</label>
+                    <input type="text" name="name" placeholder="Например: Кот" required>
+                </div>
+                <div class="field">
+                    <label>Название пака</label>
+                    <input type="text" name="pack" placeholder="Например: animals" required>
+                </div>
+                <div class="field">
+                    <label>Изображение</label>
+                    <input type="file" name="image" accept="image/*" required>
+                </div>
+                <button type="submit" class="btn">➕ Добавить стикер</button>
+            </form>
+        </div>
+    </div>
+    <script>
+        const theme = document.cookie.split('; ').find(row => row.startsWith('theme='))?.split('=')[1] || 'light';
+        if (theme === 'dark') {
+            document.body.classList.add('dark');
+        }
+    </script>
+</body>
+</html>
